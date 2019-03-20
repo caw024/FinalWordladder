@@ -210,44 +210,53 @@ def Process(infile,outfile):
       
     frontier.push([first,h_n])
     explored = {}
+    specialctr = 0
     
     #we need to find the first instance when h(n) + g(n) is 0 and this suffices bc we keep on working with the minimum g(n) + h(n)
     #note that after finding all neighbors, the dictionary dissapears so you'll have to push all the info to Pqueue
     #Read his art
-    while frontier.peek()[1] != second:
+    while specialctr == 0 and frontier.peek()[1] != second:
       for current in frontier.peek():
         #in the form of a dictionary
         allneighbors = genneighbors(current,mywordlist)
         explored.add(current)
-        for neighbors in allneighbors:
-          if neighbors in explored:
-            break
-          k = allneighbors[neighbors]
-          k.insert(0,neighbors)
-          
-          #compute h_n
-          index1 = 0
-          h_n = 0
-          while index1 < length:
-            if first[index1] != second[index1]:
-              h_n+=1
-            index1+=1
-            
-          k.insert(1,h_n)
-          frontier.push(k)                  
+        newlen = len(allneighbors)
+        for neighbor in allneighbors:
+          if neighbor not in explored:
+            k = allneighbors[neighbor]
+            k.insert(0,neighbor)
+
+            #compute h_n
+            index1 = 0
+            h_n = 0
+            while index1 < length:
+              if first[index1] != second[index1]:
+                h_n+=1
+              index1+=1
+
+            k.insert(1,h_n)
+            frontier.push(k)
+          else:
+            newlen-=1
+            if newlen == 0:
+              print("cannot traverse")
+              g = open(outfile,'w') 
+              g.write(first + "," + second + "\n" )
+              g.close()
+              specialctr = 1
+              
       
     #towrite[first] = string of things you want
     i+=2
     print(frontier.peek())
-    towrite.append(frontier.peek())
+    towrite.append(','.join( frontier.peek() ))
 
     #when fully computed, add length and path to dictionary
 
-  
+  towrite = '\n'.join(towrite)
   #g is what we will return
   g = open(outfile,'w')
-  for k in towrite:    
-    g.write(k + "," + str( len(dictionary[k])) + "\n" )
+  g.write(towrite)
   g.close()
 
             
