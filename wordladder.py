@@ -120,13 +120,13 @@ class PQueue:
       sorted.append(self.pop())
       iterations -= 1
     return sorted
-  
-  def my_cmp(a,b):
+
+def my_cmp(a,b):
     if len(a) + a[1] < len(b) + b[1]: return -1
     if len(a) + a[1] == len(b) + b[1]: return 0
     return 1
     
-def genneighbors(current,mywordlist):
+def genneighbors(length,current,mywordlist):
   #gives us all the neighbors
   neighbors = {}
   neighbors[current] = []
@@ -162,13 +162,13 @@ def Process(infile,outfile):
   wordpairs = []
   for k in check:
     words = k.split(',')
-    wordpairs.append(words[0])
-    wordpairs.append(words[1])
-
+    if len(words) > 1:     
+      wordpairs.append(words[0])
+      wordpairs.append(words[1])
     
   #length of list
   length = len(wordpairs[0])
-  print(length)
+  print("length of words: " + str(length))
   
   #word list
   dictall = open('dictall.txt','r')
@@ -194,7 +194,7 @@ def Process(infile,outfile):
     print("finding path from word " + first + " to word " + second)
     
     #my_cmp compares list lengths + sum of first element, which is g(n). h(n) can be incorporated by appending 0 or smtg
-    frontier = Pqueue(my_cmp)
+    frontier = PQueue(my_cmp)
     
     #Finding h(n)
     first1 = list(first)
@@ -208,20 +208,23 @@ def Process(infile,outfile):
         h_n+=1
       index+=1
       
-    frontier.push([first,h_n])
-    explored = {}
+    frontier.push([first,h_n,first])
+    explored = {-1}
     specialctr = 0
     
     #we need to find the first instance when h(n) + g(n) is 0 and this suffices bc we keep on working with the minimum g(n) + h(n)
     #note that after finding all neighbors, the dictionary dissapears so you'll have to push all the info to Pqueue
     #Read his art
     while specialctr == 0 and frontier.peek()[1] != second:
-      for current in frontier.peek():
+      for current in frontier.peek()[2:]:
         #in the form of a dictionary
-        allneighbors = genneighbors(current,mywordlist)
+        allneighbors = genneighbors(length,current,mywordlist)
+        print("all neighbors:")
+        print(allneighbors)
+        print("current: " + current)
         explored.add(current)
         newlen = len(allneighbors)
-        for neighbor in allneighbors:
+        for neighbor in allneighbors[current]:
           if neighbor not in explored:
             k = allneighbors[neighbor]
             k.insert(0,neighbor)
@@ -237,6 +240,7 @@ def Process(infile,outfile):
             k.insert(1,h_n)
             frontier.push(k)
           else:
+            print(neighbor + " has been explored")
             newlen-=1
             if newlen == 0:
               print("cannot traverse")
@@ -249,7 +253,7 @@ def Process(infile,outfile):
     #towrite[first] = string of things you want
     i+=2
     print(frontier.peek())
-    towrite.append(','.join( frontier.peek() ))
+    towrite.append(','.join( frontier.peek()[2:] ))
 
     #when fully computed, add length and path to dictionary
 
