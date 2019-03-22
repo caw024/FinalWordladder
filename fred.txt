@@ -1,6 +1,6 @@
+hazy,frog
 head,tail
 hate,love
 read,head
 sell,star
 head,ache
-hazy,frog
