@@ -1,130 +1,6 @@
 #!/usr/bin/python3
 import sys
-
-class PQueue:
-    
-  def OrdinaryComparison(a,b):
-    if a < b: return -1
-    if a == b: return 0
-    return 1
-
-  #what does self refer to
-  def __init__(self, comparator = OrdinaryComparison):
-    self.cmpfunc = comparator
-    self.size = 0
-    self.list = [0]
-  
-  #push an element onto the queue.
-  #data in the form of a list
-  def push(self, data):   
-    #for x in data:
-    if self.size == len(self.list) - 1:
-      self.list.append(data)
-    else:
-      self.list[self.size] = data
-    self.size += 1
-    pos = self.size
-      #print("size")
-      #print(self.size)
-      #print("0th:")
-      #print(self.list[0])
-     
-    while pos > 1 and self.cmpfunc(self.list[pos//2], self.list[pos]) == 1:
-      val = self.list[pos]
-      self.list[pos] = self.list[pos//2]
-      self.list[pos//2] = val
-      pos=pos//2
-    
-    #for i in range(1,self.size+1):
-     # print(self.list[i])
-  
-  def push_all(self,lst):
-    for x in lst:
-      if self.size == len(self.list) - 1:
-        self.list.append(x)
-      else:
-        self.list[self.size] = x
-      self.size += 1
-      pos = self.size
-      #print("size")
-      #print(self.size)
-      #print("0th:")
-      #print(self.list[0])
-     
-      while pos > 1 and self.cmpfunc(self.list[pos//2], self.list[pos]) == 1:
-        val = self.list[pos]
-        self.list[pos] = self.list[pos//2]
-        self.list[pos//2] = val
-        pos=pos//2
-
-  
-  def internal_list(self):
-    i = 1
-    lst = []
-    while i <= self.size:
-      lst.append(self.list[i])
-      i+=1
-    return lst
-                         
-  #pop the smallest element off the queue or None if the queue is empty.
-  def pop(self):
-    if self.size == 0:
-      return None
-
-    if self.size == 1:
-      self.size -= 1
-      return self.list[1]
-
-    pos = 1
-    ret = self.list[1]
-    
-    self.list[1] = self.list[self.size]
-    self.size -= 1
-      
-    while 2*pos+1 <= self.size:
-      if self.cmpfunc(self.list[pos], self.list[2*pos+1]) == 1 or self.cmpfunc(self.list[pos], self.list[2*pos]) == 1:
-        if self.cmpfunc(self.list[2*pos+1], self.list[2*pos]) == -1:
-          val = self.list[pos]
-          self.list[pos] = self.list[2*pos+1]
-          self.list[2*pos+1] = val
-          pos *= 2
-          pos += 1
-        else:
-          val = self.list[pos]
-          self.list[pos] = self.list[2*pos]
-          self.list[2*pos] = val
-          pos *= 2
-      else:
-        return ret
-
-    if 2*pos == self.size and self.cmpfunc(self.list[pos], self.list[2*pos]) == 1:
-        val = self.list[pos]
-        self.list[pos] = self.list[2*pos]
-        self.list[2*pos] = val
-        
-    return ret
-    
-  
-  #return the smallest element in queue without disturbing the queue.  It should return None if the queue is empty.
-  def peek(self):
-    if self.size == 0:
-      return None
-    return self.list[1]
-  
-  #pop() every element off the queue into a list (in order) that it returns.
-  #If the queue was empty, it returns an empty list.  Once this function returns, the queue is empty.
-  def tolist(self):
-    sorted = []
-    iterations = self.size
-    while (iterations >= 1):
-      sorted.append(self.pop())
-      iterations -= 1
-    return sorted
-
-def my_cmp(a,b):
-    if len(a) + a[1] < len(b) + b[1]: return -1
-    if len(a) + a[1] == len(b) + b[1]: return 0
-    return 1
+from pqueue import *
     
 def genneighbors(length,current,mywordlist):
   #gives us all the neighbors
@@ -134,7 +10,7 @@ def genneighbors(length,current,mywordlist):
   while index < length:
     j = 97
     #change one letter of m everytime
-    print("index: " + str(index) )
+    #print("index: " + str(index) )
     while j < 123:
       m = list(current)
       m[index] = chr(j)
@@ -191,7 +67,7 @@ def Process(infile,outfile):
     #dictionary gives us all neighbors, which will be appended to Pqueue
     first = wordpairs[i]
     second = wordpairs[i+1]
-    print("finding path from word " + first + " to word " + second)
+    print("finding path from " + first + " to " + second)
     
     #my_cmp compares list lengths + sum of first element, which is g(n). h(n) can be incorporated by appending 0 or smtg
     frontier = PQueue(my_cmp)
@@ -208,52 +84,62 @@ def Process(infile,outfile):
         h_n+=1
       index+=1
       
-    frontier.push([first,h_n,first])
+    frontier.push([first,h_n])
     explored = {-1}
     specialctr = 0
     
     #we need to find the first instance when h(n) + g(n) is 0 and this suffices bc we keep on working with the minimum g(n) + h(n)
     #note that after finding all neighbors, the dictionary dissapears so you'll have to push all the info to Pqueue
     #Read his art
-    while specialctr == 0 and frontier.peek()[1] != second:
-      for current in frontier.peek()[2:]:
+    while specialctr == 0 and frontier.peek()[0] != second:
+      current = frontier.peek()[0]
+      path = frontier.peek()[2:]
+      allneighbors = genneighbors(length,current,mywordlist)[current]
+      #print("all neighbors of " + current + ":")
+      #print(allneighbors)
+      explored.add(current)
+      frontier.pop()
+      newlen = len(allneighbors)
+            
+      for neighbor in allneighbors:
         #in the form of a dictionary
-        allneighbors = genneighbors(length,current,mywordlist)
-        print("all neighbors:")
-        print(allneighbors)
-        print("current: " + current)
-        explored.add(current)
-        newlen = len(allneighbors)
-        for neighbor in allneighbors[current]:
-          if neighbor not in explored:
-            k = allneighbors[neighbor]
-            k.insert(0,neighbor)
+        if neighbor not in explored:
+          k = []
+          for r in path:
+            k.append(r)
+          k.append(current)
+          k.insert(0,neighbor)
 
-            #compute h_n
-            index1 = 0
-            h_n = 0
-            while index1 < length:
-              if first[index1] != second[index1]:
-                h_n+=1
-              index1+=1
+          #compute h_n
+          index1 = 0
+          h_n = 0
+          test = list(current)
+          while index1 < length:
+            if test[index1] != second1[index1]:
+              h_n+=1
+            index1+=1
 
-            k.insert(1,h_n)
-            frontier.push(k)
-          else:
-            print(neighbor + " has been explored")
-            newlen-=1
-            if newlen == 0:
-              print("cannot traverse")
-              g = open(outfile,'w') 
-              g.write(first + "," + second + "\n" )
-              g.close()
-              specialctr = 1
+          k.insert(1,h_n)
+          frontier.push(k)
+        #else:
+          #print(neighbor + " has been explored")
+          newlen-=1
+          #if newlen == 0:
+            #print("bad path from " + first + " to " + second)
+            #frontier.pop()
+            #g = open(outfile,'w')           
+            #g.write(first + "," + second + "\n" )
+            #g.close()
+            #specialctr = 1
               
       
     #towrite[first] = string of things you want
     i+=2
-    print(frontier.peek())
-    towrite.append(','.join( frontier.peek()[2:] ))
+    print("shortest distance from " + first + " to " + second)
+    bestpath = frontier.peek()[2:]
+    bestpath.append(frontier.peek()[0])
+    print(bestpath)
+    towrite.append(','.join(bestpath))
 
     #when fully computed, add length and path to dictionary
 
