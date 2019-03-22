@@ -2,7 +2,7 @@
 import sys
 from pqueue import *
     
-def genneighbors(length,current,mywordlist):
+def genneighbors(length,current,mywordlist,explored):
   #gives us all the neighbors
   neighbors = {}
   neighbors[current] = []
@@ -16,7 +16,7 @@ def genneighbors(length,current,mywordlist):
       m[index] = chr(j)
       m = "".join(m)
       #print(m in mywordlist)
-      if m in mywordlist:
+      if m in mywordlist and m not in explored:
         if m == current:
           pass
         else:
@@ -72,7 +72,7 @@ def Process(infile,outfile):
     #my_cmp compares list lengths + sum of first element, which is g(n). h(n) can be incorporated by appending 0 or smtg
     frontier = PQueue(my_cmp)
     
-    #Finding h(n)
+    #Finding h(n), the min number of moves to finish
     first1 = list(first)
     second1 = list(second)
     h_n = 0
@@ -91,15 +91,15 @@ def Process(infile,outfile):
     #we need to find the first instance when h(n) + g(n) is 0 and this suffices bc we keep on working with the minimum g(n) + h(n)
     #note that after finding all neighbors, the dictionary dissapears so you'll have to push all the info to Pqueue
     #Read his art
-    while specialctr == 0 and frontier.peek()[0] != second:
+    while frontier.peek() != None and frontier.peek()[0] != second:
       current = frontier.peek()[0]
       path = frontier.peek()[2:]
-      allneighbors = genneighbors(length,current,mywordlist)[current]
+      allneighbors = genneighbors(length,current,mywordlist,explored)[current]
       #print("all neighbors of " + current + ":")
       #print(allneighbors)
       explored.add(current)
       frontier.pop()
-      newlen = len(allneighbors)
+      #newlen = len(allneighbors)
             
       for neighbor in allneighbors:
         #in the form of a dictionary
@@ -110,38 +110,35 @@ def Process(infile,outfile):
           k.append(current)
           k.insert(0,neighbor)
 
-          #compute h_n
+          #compute h_n, minimum distance needed
           index1 = 0
           h_n = 0
-          test = list(current)
+          test = list(neighbor)
           while index1 < length:
             if test[index1] != second1[index1]:
               h_n+=1
             index1+=1
 
           k.insert(1,h_n)
+          #print(k)
           frontier.push(k)
         #else:
           #print(neighbor + " has been explored")
-          newlen-=1
-          #if newlen == 0:
-            #print("bad path from " + first + " to " + second)
-            #frontier.pop()
-            #g = open(outfile,'w')           
-            #g.write(first + "," + second + "\n" )
-            #g.close()
-            #specialctr = 1
-              
       
     #towrite[first] = string of things you want
-    i+=2
-    print("shortest distance from " + first + " to " + second)
-    bestpath = frontier.peek()[2:]
-    bestpath.append(frontier.peek()[0])
-    print(bestpath)
-    towrite.append(','.join(bestpath))
-
     #when fully computed, add length and path to dictionary
+    if frontier.peek()==None:
+      print("no path from " + first + " to " + second)
+      towrite.append(first+","+second)
+    else:
+      print("shortest distance from " + first + " to " + second)
+      bestpath = frontier.peek()[2:]
+      bestpath.append(frontier.peek()[0])
+      print(bestpath)
+      towrite.append(','.join(bestpath))
+    i+=2
+
+    
 
   towrite = '\n'.join(towrite)
   #g is what we will return
