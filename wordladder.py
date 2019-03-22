@@ -120,9 +120,9 @@ def Process(infile,outfile):
             index1+=1
 
           k.insert(1,h_n)
-          print(k)
+          #print(k)
           # we reach ['meek', 4, 'hazy', 'haze', 'hare', 'here', 'herd', 'heed', 'deed', 'meed'] trying to go to frog and can't go anywhere anymore
-          #actual: [hazy,haze,hate,bate,bats,baas,bras,brag,brig.frig]
+          #actual: [frog,0,hazy,haze,hate,bate,bats,baas,bras,brag,brig.frig,frog]
           frontier.push(k)
         #else:
           #print(neighbor + " has been explored")
