@@ -73,6 +73,7 @@ def Process(infile,outfile):
   #print(k)
   
   towrite = []
+  checked = {}
       
   i = 0
   while i < len(wordpairs):
@@ -98,7 +99,11 @@ def Process(infile,outfile):
       path = frontier.peek()[2:]
       #print("current: " + current + "\th_n: " + str( frontier.peek()[1]) )
       #print(path)
-      allneighbors = genneighbors(length,current,mywordlist)[current]
+      if current not in checked:
+        allneighbors = genneighbors(length,current,mywordlist)[current]
+        checked[current] = allneighbors
+      else:
+        allneighbors = checked[current]
       if current == target:
         break
       #print("all neighbors of " + current + ":")
@@ -108,7 +113,6 @@ def Process(infile,outfile):
       #print("we have explored: ")
       #print(explored)
       frontier.pop()
-
             
       for neighbor in allneighbors:
         #in the form of a dictionary
