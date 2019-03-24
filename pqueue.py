@@ -17,7 +17,7 @@ class PQueue:
     if self.size == len(self.list) - 1:
       self.list.append(data)
     else:
-      self.list[self.size] = data
+      self.list[self.size+1] = data
     self.size += 1
     pos = self.size
       #print("size")
@@ -29,10 +29,10 @@ class PQueue:
       val = self.list[pos]
       self.list[pos] = self.list[pos//2]
       self.list[pos//2] = val
-      pos=pos//2
+      pos = pos//2
     
     #for i in range(1,self.size+1):
-     # print(self.list[i])
+      #print(self.list[i])
   
   def push_all(self,lst):
     for x in lst:
@@ -77,7 +77,7 @@ class PQueue:
     self.list[1] = self.list[self.size]
     self.size -= 1
       
-    while 2*pos+1 <= self.size:
+    while 2*pos-1 < self.size:
       if self.cmpfunc(self.list[pos], self.list[2*pos+1]) == 1 or self.cmpfunc(self.list[pos], self.list[2*pos]) == 1:
         if self.cmpfunc(self.list[2*pos+1], self.list[2*pos]) == -1:
           val = self.list[pos]
@@ -118,6 +118,6 @@ class PQueue:
     return sorted
 
 def my_cmp(a,b):
-    if len(a) + a[1] < len(b) + b[1]: return -1
-    if len(a) + a[1] == len(b) + b[1]: return 0
+    if (len(a) + a[1]) < (len(b) + b[1]): return -1
+    if (len(a) + a[1]) == (len(b) + b[1]): return 0
     return 1

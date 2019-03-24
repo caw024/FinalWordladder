@@ -1,6 +1,9 @@
+hazy,haze
+hazy,hate
+hazy,bate
+hazy,bats
+hazy,baas
+hazy,brag
+hazy,brig
+hazy,frig
 hazy,frog
-head,tail
-hate,love
-read,head
-sell,star
-head,ache
