@@ -74,7 +74,6 @@ def Process(infile,outfile):
   
   towrite = []
       
-  
   i = 0
   while i < len(wordpairs):
     #dictionary gives us all neighbors, which will be appended to Pqueue
@@ -94,6 +93,7 @@ def Process(infile,outfile):
     #we need to find the first instance when h(n) is 0 and this suffices bc we keep on working with the minimum g(n) + h(n)
     #note that after finding all neighbors, the dictionary dissapears so you'll have to push all the info to Pqueue
     while frontier.peek() != None:
+      #t = frontier.pop()
       current = frontier.peek()[0]
       path = frontier.peek()[2:]
       #print("current: " + current + "\th_n: " + str( frontier.peek()[1]) )
@@ -104,18 +104,16 @@ def Process(infile,outfile):
       #print("all neighbors of " + current + ":")
       #print(allneighbors)
       
-      frontier.pop()
       explored.add(current)
       #print("we have explored: ")
       #print(explored)
+      frontier.pop()
 
             
       for neighbor in allneighbors:
         #in the form of a dictionary
         if neighbor not in explored:
-          k = []
-          for r in path:
-            k.append(r)
+          k = path[:]
           k.append(current)
           k.insert(0,neighbor)
 
